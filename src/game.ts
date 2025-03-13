@@ -68,7 +68,7 @@ class ChessGame {
     }
 
     private getPieceSymbol(piece: Piece): string {
-        // 使用实心圆形棋子替代Unicode字符
+        // 使用SVG图标作为棋子
         return `<div class="chess-piece ${piece.color}-piece piece-${piece.type}"></div>`;
     }
 

@@ -7,11 +7,8 @@
 
 :root {
     --square-size: 60px;
-    --font-size: 40px;
     --white-piece-color: #ffffff;
     --black-piece-color: #000000;
-    --white-piece-border: #000000;
-    --black-piece-border: #ffffff;
 }
 
 body {
@@ -57,7 +54,6 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: var(--font-size);
     cursor: pointer;
     transition: background-color 0.2s;
     user-select: none;
@@ -72,53 +68,13 @@ h1 {
     background-color: #b58863;
 }
 
-/* 全新的棋子样式 - 实心带边框 */
+/* 棋子样式 */
 .chess-piece {
-    width: 70%;
-    height: 70%;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.white-piece {
-    background-color: var(--white-piece-color);
-    border: 2px solid var(--white-piece-border);
-    color: var(--white-piece-border);
-}
-
-.black-piece {
-    background-color: var(--black-piece-color);
-    border: 2px solid var(--black-piece-border);
-    color: var(--black-piece-border);
-}
-
-/* 每种棋子的特殊标记 */
-.piece-king::after {
-    content: "K";
-}
-
-.piece-queen::after {
-    content: "Q";
-}
-
-.piece-rook::after {
-    content: "R";
-}
-
-.piece-bishop::after {
-    content: "B";
-}
-
-.piece-knight::after {
-    content: "N";
-}
-
-.piece-pawn::after {
-    content: "P";
+    width: 80%;
+    height: 80%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 
 .selected {
@@ -160,7 +116,6 @@ h1 {
 @media (max-width: 600px) {
     :root {
         --square-size: calc(min(100vw / 9, 45px));
-        --font-size: calc(min(100vw / 13, 32px));
     }
     
     h1 {
@@ -184,7 +139,6 @@ h1 {
 @media (max-width: 400px) {
     :root {
         --square-size: calc(min(100vw / 9, 40px));
-        --font-size: calc(min(100vw / 14, 28px));
     }
     
     h1 {
