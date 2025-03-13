@@ -1,4 +1,4 @@
-# 国际象棋游戏
+# Evans的国际象棋时间
 
 这是一个使用 TypeScript 实现的简单国际象棋游戏。
 
@@ -35,4 +35,4 @@
 
 - TypeScript
 - HTML5
-- CSS3 
+- CSS3
