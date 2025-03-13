@@ -138,11 +138,11 @@ class ChessGame {
             // 显示对话框
             dialog.classList.add('show');
             
-            // 设置1秒后自动隐藏
+            // 设置2秒后自动隐藏
             this.checkDialogTimeout = window.setTimeout(() => {
                 dialog.classList.remove('show');
                 this.checkDialogTimeout = null;
-            }, 1000);
+            }, 2000);
         }
     }
 
@@ -576,4 +576,4 @@ class ChessGame {
 document.addEventListener('DOMContentLoaded', () => {
     const game = new ChessGame();
     document.getElementById('reset-button')?.addEventListener('click', () => game.reset());
-}); 
+});

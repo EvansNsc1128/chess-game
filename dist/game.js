@@ -118,11 +118,11 @@ class ChessGame {
             }
             // 显示对话框
             dialog.classList.add('show');
-            // 设置1秒后自动隐藏
+            // 设置2秒后自动隐藏
             this.checkDialogTimeout = window.setTimeout(() => {
                 dialog.classList.remove('show');
                 this.checkDialogTimeout = null;
-            }, 1000);
+            }, 2000);
         }
     }
     isValidMove(from, to) {
