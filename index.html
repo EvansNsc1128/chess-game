@@ -1,30 +1,29 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>Evans的国际象棋时间</title>
-    <link rel="stylesheet" href="styles/style.css?v=1.7">
-    <link rel="stylesheet" href="styles/chess-pieces.css?v=1.7">
+    <meta http-equiv="refresh" content="0;url=chess/">
+    <title>重定向到国际象棋游戏</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Evans的国际象棋时间</h1>
-        <div id="chessboard" class="chessboard"></div>
-        <div class="game-info">
-            <div id="status" class="status">轮到白方走棋</div>
-            <button id="reset-button" class="reset-button">重新开始</button>
-        </div>
-    </div>
-    
-    <!-- 将军对话框 -->
-    <div id="check-dialog" class="check-dialog">Evans悄悄说：伯伯，将军！</div>
-    
-    <script type="module" src="dist/game.js?v=1.7"></script>
+    <h1>正在跳转到国际象棋游戏...</h1>
+    <p>如果页面没有自动跳转，请<a href="chess/">点击这里</a>。</p>
+    <script>
+        window.location.href = "chess/";
+    </script>
 </body>
 </html> 

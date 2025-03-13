@@ -1,0 +1,19 @@
+# Node.js依赖
+node_modules/
+
+# 编译输出
+dist/*.js.map
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 日志文件
+*.log
+npm-debug.log*
+
+# 编辑器配置
+.idea/
+.vscode/
+*.swp
+*.swo 

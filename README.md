@@ -1,38 +1,30 @@
-# Evans的国际象棋时间
+# Evans的国际象棋游戏
 
-这是一个使用 TypeScript 实现的简单国际象棋游戏。
+这是一个使用TypeScript和React开发的简单国际象棋游戏，支持人机对战模式。
 
-## 功能特点
+## 特性
 
-- 完整的国际象棋规则实现
-- 支持所有棋子的移动规则
-- 高亮显示可移动位置
-- 简洁美观的界面
-- 支持重新开始游戏
+- 简洁明了的国际象棋界面
+- 支持人机对战
+- 符合国际象棋规则，包括将军和将死检测
+- 移动设备友好的响应式设计
+- 美观的棋子图标
 
-## 如何运行
+## 如何访问
 
-1. 安装 TypeScript（如果尚未安装）：
-   ```bash
-   npm install -g typescript
-   ```
+游戏已部署在GitHub Pages上，可以通过以下链接访问：
+[https://evansnsc1128.github.io/chess-game/](https://evansnsc1128.github.io/chess-game/)
 
-2. 编译 TypeScript 文件：
-   ```bash
-   tsc
-   ```
+## 本地运行
 
-3. 在浏览器中打开 `index.html` 文件即可开始游戏。
+如果想在本地运行：
 
-## 游戏说明
+1. 克隆仓库
+2. 进入项目目录
+3. 运行 `npm install` 安装依赖
+4. 运行 `npx tsc` 编译TypeScript代码
+5. 使用HTTP服务器运行项目，例如 `python3 -m http.server`
 
-- 白方先行
-- 点击棋子可以看到所有可能的移动位置
-- 点击高亮的格子可以移动棋子
-- 点击"重新开始"按钮可以重置游戏
+## 许可
 
-## 技术栈
-
-- TypeScript
-- HTML5
-- CSS3
+本项目遵循MIT许可证 
