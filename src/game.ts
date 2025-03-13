@@ -68,18 +68,8 @@ class ChessGame {
     }
 
     private getPieceSymbol(piece: Piece): string {
-        // 统一使用白棋的图标样式，并为黑棋添加特殊类
-        const symbols: Record<PieceType, string> = {
-            king: '&#9812;',  // ♔
-            queen: '&#9813;', // ♕
-            rook: '&#9814;',  // ♖
-            bishop: '&#9815;', // ♗
-            knight: '&#9816;', // ♘
-            pawn: '&#9817;'   // ♙
-        };
-        
-        // 使用 HTML 实体代码替代 Unicode 字符，提高兼容性
-        return `<span class="${piece.color}-piece">${symbols[piece.type]}</span>`;
+        // 使用实心圆形棋子替代Unicode字符
+        return `<div class="chess-piece ${piece.color}-piece piece-${piece.type}"></div>`;
     }
 
     private handleSquareClick(row: number, col: number) {

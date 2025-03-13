@@ -8,6 +8,10 @@
 :root {
     --square-size: 60px;
     --font-size: 40px;
+    --white-piece-color: #ffffff;
+    --black-piece-color: #000000;
+    --white-piece-border: #000000;
+    --black-piece-border: #ffffff;
 }
 
 body {
@@ -61,26 +65,60 @@ h1 {
 }
 
 .white {
-    background-color: #fff;
+    background-color: #f0d9b5;
 }
 
 .black {
-    background-color: #769656;
+    background-color: #b58863;
 }
 
-/* 改进的棋子样式，统一使用 Unicode 符号 */
+/* 全新的棋子样式 - 实心带边框 */
+.chess-piece {
+    width: 70%;
+    height: 70%;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 .white-piece {
-    display: inline-block;
-    color: white !important;
-    text-shadow: 0 0 1px #000, 0 0 2px #000, 0 0 3px #000 !important;
-    -webkit-text-stroke: 1px black;
+    background-color: var(--white-piece-color);
+    border: 2px solid var(--white-piece-border);
+    color: var(--white-piece-border);
 }
 
 .black-piece {
-    display: inline-block;
-    color: black !important;
-    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff !important;
-    -webkit-text-stroke: 1px white;
+    background-color: var(--black-piece-color);
+    border: 2px solid var(--black-piece-border);
+    color: var(--black-piece-border);
+}
+
+/* 每种棋子的特殊标记 */
+.piece-king::after {
+    content: "K";
+}
+
+.piece-queen::after {
+    content: "Q";
+}
+
+.piece-rook::after {
+    content: "R";
+}
+
+.piece-bishop::after {
+    content: "B";
+}
+
+.piece-knight::after {
+    content: "N";
+}
+
+.piece-pawn::after {
+    content: "P";
 }
 
 .selected {
