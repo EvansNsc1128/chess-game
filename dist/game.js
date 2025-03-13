@@ -5,6 +5,7 @@ class ChessGame {
         this.validMoves = [];
         this.isComputerThinking = false;
         this.isGameOver = false;
+        this.isCheck = false;
         this.board = this.createInitialBoard();
         this.initializeGame();
     }
@@ -67,12 +68,23 @@ class ChessGame {
         const piece = this.board[row][col];
         if (this.selectedPiece) {
             if (this.isValidMove(this.selectedPiece, clickedSquare)) {
-                this.movePiece(this.selectedPiece, clickedSquare);
-                this.selectedPiece = null;
-                this.validMoves = [];
+                this.makeMove(this.selectedPiece, clickedSquare);
                 // 玩家下完，切换到电脑
                 this.currentPlayer = 'black';
                 this.renderBoard();
+                // 检查是否将军或将死
+                if (this.isKingInCheck('black')) {
+                    this.isCheck = true;
+                    if (this.isCheckmate('black')) {
+                        this.isGameOver = true;
+                        const status = document.getElementById('status');
+                        status.textContent = '将死！白方获胜！';
+                        return;
+                    }
+                }
+                else {
+                    this.isCheck = false;
+                }
                 // 电脑走棋（稍微延迟，增加体验感）
                 this.isComputerThinking = true;
                 setTimeout(() => {
@@ -122,7 +134,121 @@ class ChessGame {
                 this.getKingMoves(pos, moves);
                 break;
         }
+        // 过滤掉会导致自己被将军的移动
+        return this.filterMovesPreventingCheck(pos, moves);
+    }
+    // 过滤掉会导致自己被将军的移动
+    filterMovesPreventingCheck(from, moves) {
+        const piece = this.board[from.row][from.col];
+        if (!piece)
+            return [];
+        return moves.filter(to => {
+            // 临时移动棋子
+            const capturedPiece = this.board[to.row][to.col];
+            this.board[to.row][to.col] = piece;
+            this.board[from.row][from.col] = null;
+            // 检查移动后是否会导致自己被将军
+            const inCheck = this.isKingInCheck(piece.color);
+            // 恢复棋盘状态
+            this.board[from.row][from.col] = piece;
+            this.board[to.row][to.col] = capturedPiece;
+            // 如果移动后不会被将军，这是一个有效的移动
+            return !inCheck;
+        });
+    }
+    // 检查指定颜色的王是否被将军
+    isKingInCheck(color) {
+        // 找到王的位置
+        const kingPosition = this.findKingPosition(color);
+        if (!kingPosition)
+            return false;
+        // 检查对方的每个棋子是否可以攻击到王
+        const opponentColor = color === 'white' ? 'black' : 'white';
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const piece = this.board[row][col];
+                if (piece && piece.color === opponentColor) {
+                    const moves = this.getAllPossibleMoves({ row, col });
+                    if (moves.some(move => move.row === kingPosition.row && move.col === kingPosition.col)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    // 检查是否将死（王被将军且无法移动）
+    isCheckmate(color) {
+        // 如果王没有被将军，不是将死
+        if (!this.isKingInCheck(color))
+            return false;
+        // 检查该方的每个棋子是否有有效移动来解除将军
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const piece = this.board[row][col];
+                if (piece && piece.color === color) {
+                    const validMoves = this.getValidMoves({ row, col });
+                    if (validMoves.length > 0) {
+                        return false; // 有有效移动，不是将死
+                    }
+                }
+            }
+        }
+        // 如果没有找到任何有效移动，则是将死
+        return true;
+    }
+    // 找到指定颜色的王的位置
+    findKingPosition(color) {
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const piece = this.board[row][col];
+                if (piece && piece.type === 'king' && piece.color === color) {
+                    return { row, col };
+                }
+            }
+        }
+        return null;
+    }
+    // 获取棋子所有可能的移动（包括可能导致自己被将军的移动）
+    getAllPossibleMoves(pos) {
+        const piece = this.board[pos.row][pos.col];
+        if (!piece)
+            return [];
+        const moves = [];
+        switch (piece.type) {
+            case 'pawn':
+                this.getPawnMoves(pos, moves);
+                break;
+            case 'rook':
+                this.getRookMoves(pos, moves);
+                break;
+            case 'knight':
+                this.getKnightMoves(pos, moves);
+                break;
+            case 'bishop':
+                this.getBishopMoves(pos, moves);
+                break;
+            case 'queen':
+                this.getQueenMoves(pos, moves);
+                break;
+            case 'king':
+                this.getKingMoves(pos, moves);
+                break;
+        }
         return moves;
+    }
+    // 实际执行移动，并更新游戏状态
+    makeMove(from, to) {
+        const piece = this.board[from.row][from.col];
+        if (!piece)
+            return;
+        this.board[to.row][to.col] = piece;
+        this.board[from.row][from.col] = null;
+        if (piece.type === 'pawn') {
+            piece.hasMoved = true;
+        }
+        this.selectedPiece = null;
+        this.validMoves = [];
     }
     getPawnMoves(pos, moves) {
         var _a, _b;
@@ -223,14 +349,7 @@ class ChessGame {
         return row >= 0 && row < 8 && col >= 0 && col < 8;
     }
     movePiece(from, to) {
-        const piece = this.board[from.row][from.col];
-        if (!piece)
-            return;
-        this.board[to.row][to.col] = piece;
-        this.board[from.row][from.col] = null;
-        if (piece.type === 'pawn') {
-            piece.hasMoved = true;
-        }
+        this.makeMove(from, to);
     }
     highlightValidMoves() {
         if (!this.selectedPiece)
@@ -249,8 +368,14 @@ class ChessGame {
     }
     updateStatus() {
         const status = document.getElementById('status');
-        if (this.isComputerThinking) {
+        if (this.isGameOver) {
+            return; // 游戏结束状态已经设置了
+        }
+        else if (this.isComputerThinking) {
             status.textContent = '电脑正在思考...';
+        }
+        else if (this.isCheck && this.currentPlayer === 'white') {
+            status.textContent = '警告：您被将军了！请解除威胁';
         }
         else {
             status.textContent = `轮到${this.currentPlayer === 'white' ? '您(白方)' : '电脑(黑方)'}走棋`;
@@ -259,7 +384,7 @@ class ChessGame {
     makeComputerMove() {
         // 寻找所有可移动的黑棋
         const allPossibleMoves = [];
-        // 收集所有黑棋的可能移动
+        // 收集所有黑棋的可能移动（已经过滤掉会导致自己被将军的移动）
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
                 const piece = this.board[row][col];
@@ -276,14 +401,38 @@ class ChessGame {
             // 没有可走的棋，游戏结束
             this.isGameOver = true;
             const status = document.getElementById('status');
-            status.textContent = '游戏结束，白方获胜！';
+            // 判断是将死还是逼和
+            if (this.isKingInCheck('black')) {
+                status.textContent = '将死！白方获胜！';
+            }
+            else {
+                status.textContent = '逼和！游戏结束';
+            }
             return;
         }
-        // 为AI设置一点简单的策略
-        // 1. 优先考虑吃子
+        // 为AI设置策略
+        // 1. 如果能将军，优先将军
+        const checkMoves = allPossibleMoves.filter(move => {
+            // 临时移动
+            const piece = this.board[move.from.row][move.from.col];
+            const capturedPiece = this.board[move.to.row][move.to.col];
+            this.board[move.to.row][move.to.col] = piece;
+            this.board[move.from.row][move.from.col] = null;
+            // 检查是否将军
+            const isCheck = this.isKingInCheck('white');
+            // 恢复棋盘
+            this.board[move.from.row][move.from.col] = piece;
+            this.board[move.to.row][move.to.col] = capturedPiece;
+            return isCheck;
+        });
+        // 2. 如果能吃子，次优先吃子
         const captureMoves = allPossibleMoves.filter(move => this.board[move.to.row][move.to.col] !== null);
         let selectedMove;
-        if (captureMoves.length > 0) {
+        if (checkMoves.length > 0) {
+            // 随机选择一个将军行动
+            selectedMove = checkMoves[Math.floor(Math.random() * checkMoves.length)];
+        }
+        else if (captureMoves.length > 0) {
             // 随机选择一个吃子行动
             selectedMove = captureMoves[Math.floor(Math.random() * captureMoves.length)];
         }
@@ -292,31 +441,24 @@ class ChessGame {
             selectedMove = allPossibleMoves[Math.floor(Math.random() * allPossibleMoves.length)];
         }
         // 移动棋子
-        this.movePiece(selectedMove.from, selectedMove.to);
+        this.makeMove(selectedMove.from, selectedMove.to);
         // 切换回玩家的回合
         this.currentPlayer = 'white';
-        this.renderBoard();
-        // 检查玩家是否还有有效走法
-        let playerHasValidMoves = false;
-        for (let row = 0; row < 8; row++) {
-            for (let col = 0; col < 8; col++) {
-                const piece = this.board[row][col];
-                if (piece && piece.color === 'white') {
-                    const moves = this.getValidMoves({ row, col });
-                    if (moves.length > 0) {
-                        playerHasValidMoves = true;
-                        break;
-                    }
-                }
+        // 检查是否将军或将死
+        if (this.isKingInCheck('white')) {
+            this.isCheck = true;
+            if (this.isCheckmate('white')) {
+                this.isGameOver = true;
+                const status = document.getElementById('status');
+                status.textContent = '将死！黑方获胜！';
+                this.renderBoard();
+                return;
             }
-            if (playerHasValidMoves)
-                break;
         }
-        if (!playerHasValidMoves) {
-            this.isGameOver = true;
-            const status = document.getElementById('status');
-            status.textContent = '游戏结束，黑方获胜！';
+        else {
+            this.isCheck = false;
         }
+        this.renderBoard();
     }
     reset() {
         this.board = this.createInitialBoard();
@@ -325,6 +467,7 @@ class ChessGame {
         this.validMoves = [];
         this.isComputerThinking = false;
         this.isGameOver = false;
+        this.isCheck = false;
         this.initializeGame();
     }
 }
