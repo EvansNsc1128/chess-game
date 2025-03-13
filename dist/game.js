@@ -55,13 +55,14 @@ class ChessGame {
     getPieceSymbol(piece) {
         // 统一使用白棋的图标样式，并为黑棋添加特殊类
         const symbols = {
-            king: '♔',
-            queen: '♕',
-            rook: '♖',
-            bishop: '♗',
-            knight: '♘',
-            pawn: '♙'
+            king: '&#9812;', // ♔
+            queen: '&#9813;', // ♕
+            rook: '&#9814;', // ♖
+            bishop: '&#9815;', // ♗
+            knight: '&#9816;', // ♘
+            pawn: '&#9817;' // ♙
         };
+        // 使用 HTML 实体代码替代 Unicode 字符，提高兼容性
         return `<span class="${piece.color}-piece">${symbols[piece.type]}</span>`;
     }
     handleSquareClick(row, col) {
