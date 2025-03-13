@@ -133,7 +133,14 @@ class ChessGame {
             // 清除之前的超时
             if (this.checkDialogTimeout !== null) {
                 window.clearTimeout(this.checkDialogTimeout);
+                this.checkDialogTimeout = null;
             }
+            
+            // 移除之前的show类（如果存在）
+            dialog.classList.remove('show');
+            
+            // 强制重绘
+            void dialog.offsetWidth;
             
             // 显示对话框
             dialog.classList.add('show');
@@ -143,6 +150,10 @@ class ChessGame {
                 dialog.classList.remove('show');
                 this.checkDialogTimeout = null;
             }, 2000);
+            
+            console.log('显示将军对话框');
+        } else {
+            console.error('找不到将军对话框元素');
         }
     }
 
