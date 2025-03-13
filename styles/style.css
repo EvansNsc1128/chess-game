@@ -12,12 +12,15 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #f0f0f0;
+    color: #333;
     padding: 1rem;
     overscroll-behavior: none;
     touch-action: manipulation;
@@ -25,114 +28,148 @@ body {
 
 .container {
     text-align: center;
-    width: 100%;
-    max-width: 600px;
+    padding: 20px;
+    max-width: 100%;
 }
 
 h1 {
-    margin-bottom: 2rem;
+    margin-bottom: 20px;
     color: #333;
-    font-size: 1.8rem;
+    font-size: 24px;
 }
 
-#chessboard {
+.status {
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.chessboard {
     display: grid;
-    grid-template-columns: repeat(8, var(--square-size));
-    grid-template-rows: repeat(8, var(--square-size));
-    border: 2px solid #333;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    width: 80vw;
+    max-width: 500px;
+    height: 80vw;
+    max-height: 500px;
     margin: 0 auto;
-    width: calc(var(--square-size) * 8);
-    height: calc(var(--square-size) * 8);
-    touch-action: manipulation;
-    user-select: none;
-    -webkit-user-select: none;
+    border: 2px solid #333;
 }
 
 .square {
-    width: var(--square-size);
-    height: var(--square-size);
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 30px;
     cursor: pointer;
-    transition: background-color 0.2s;
-    user-select: none;
-    -webkit-user-select: none;
 }
 
 .white {
-    background-color: #f0d9b5;
+    background-color: #E8D0AA;
 }
 
 .black {
-    background-color: #b58863;
+    background-color: #B58863;
+}
+
+.selected {
+    background-color: rgba(255, 255, 0, 0.5) !important;
+}
+
+.valid-move {
+    position: relative;
+}
+
+.valid-move::after {
+    content: '';
+    position: absolute;
+    width: 30%;
+    height: 30%;
+    background-color: rgba(0, 255, 0, 0.4);
+    border-radius: 50%;
+}
+
+.reset-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.reset-button:hover {
+    background-color: #555;
 }
 
 /* 棋子样式 */
 .chess-piece {
     width: 80%;
     height: 80%;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.selected {
-    background-color: #baca44;
+.white-piece {
+    background-color: #fff;
+    color: #000;
 }
 
-.valid-move {
-    background-color: rgba(255, 255, 0, 0.4);
+.black-piece {
+    background-color: #000;
+    color: #fff;
 }
 
-.game-info {
-    margin-top: 2rem;
-    width: 100%;
-}
-
-#status {
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
-}
-
-#reset-button {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    background-color: #4CAF50;
+/* 将军对话框样式 */
+.check-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 0, 0, 0.8);
     color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    text-align: center;
 }
 
-#reset-button:hover {
-    background-color: #45a049;
+.check-dialog.show {
+    opacity: 1;
+    visibility: visible;
 }
 
-/* 响应式设计，适应不同屏幕尺寸 */
+/* 响应式设计 */
 @media (max-width: 600px) {
-    :root {
-        --square-size: calc(min(100vw / 9, 45px));
+    .chessboard {
+        width: 90vw;
+        height: 90vw;
     }
     
     h1 {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
+        font-size: 20px;
     }
     
-    .game-info {
-        margin-top: 1rem;
+    .status {
+        font-size: 16px;
     }
     
-    #status {
-        font-size: 1rem;
-    }
-    
-    body {
-        padding: 0.5rem;
+    .check-dialog {
+        font-size: 16px;
+        padding: 10px 20px;
     }
 }
 
@@ -152,5 +189,9 @@ h1 {
     
     body {
         padding: 0.3rem;
+    }
+    
+    .check-dialog-content p {
+        font-size: 1rem;
     }
 } 

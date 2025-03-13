@@ -8,6 +8,7 @@ class ChessGame {
     private isComputerThinking: boolean = false;
     private isGameOver: boolean = false;
     private isCheck: boolean = false;
+    private checkDialogTimeout: number | null = null;
 
     constructor() {
         this.board = this.createInitialBoard();
@@ -94,6 +95,7 @@ class ChessGame {
                 // 检查是否将军或将死
                 if (this.isKingInCheck('black')) {
                     this.isCheck = true;
+                    this.showCheckDialog();
                     if (this.isCheckmate('black')) {
                         this.isGameOver = true;
                         const status = document.getElementById('status')!;
@@ -121,6 +123,26 @@ class ChessGame {
             this.validMoves = this.getValidMoves(clickedSquare);
             this.renderBoard();
             this.highlightValidMoves();
+        }
+    }
+
+    // 显示将军对话框
+    private showCheckDialog() {
+        const dialog = document.getElementById('check-dialog');
+        if (dialog) {
+            // 清除之前的超时
+            if (this.checkDialogTimeout !== null) {
+                window.clearTimeout(this.checkDialogTimeout);
+            }
+            
+            // 显示对话框
+            dialog.classList.add('show');
+            
+            // 设置1秒后自动隐藏
+            this.checkDialogTimeout = window.setTimeout(() => {
+                dialog.classList.remove('show');
+                this.checkDialogTimeout = null;
+            }, 1000);
         }
     }
 
@@ -516,6 +538,7 @@ class ChessGame {
         // 检查是否将军或将死
         if (this.isKingInCheck('white')) {
             this.isCheck = true;
+            this.showCheckDialog(); // 当电脑将军玩家时，也显示对话框
             if (this.isCheckmate('white')) {
                 this.isGameOver = true;
                 const status = document.getElementById('status')!;
@@ -538,6 +561,13 @@ class ChessGame {
         this.isComputerThinking = false;
         this.isGameOver = false;
         this.isCheck = false;
+        
+        // 清除对话框超时
+        if (this.checkDialogTimeout !== null) {
+            window.clearTimeout(this.checkDialogTimeout);
+            this.checkDialogTimeout = null;
+        }
+        
         this.initializeGame();
     }
 }
