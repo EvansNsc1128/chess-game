@@ -109,21 +109,20 @@ h1 {
 .chess-piece {
     width: 80%;
     height: 80%;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
     position: relative;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .white-piece {
-    background-color: #fff;
+    background-color: transparent;
     color: #000;
 }
 
 .black-piece {
-    background-color: #000;
+    background-color: transparent;
     color: #fff;
 }
 
