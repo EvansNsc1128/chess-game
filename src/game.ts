@@ -1,10 +1,12 @@
-import { Piece, Position, Move, PieceColor, PieceType } from './types';
+import type { Piece, Position, Move, PieceColor, PieceType } from './types.js';
 
 class ChessGame {
     private board: (Piece | null)[][];
     private currentPlayer: PieceColor = 'white';
     private selectedPiece: Position | null = null;
     private validMoves: Position[] = [];
+    private isComputerThinking: boolean = false;
+    private isGameOver: boolean = false;
 
     constructor() {
         this.board = this.createInitialBoard();
@@ -78,6 +80,12 @@ class ChessGame {
     }
 
     private handleSquareClick(row: number, col: number) {
+        // 如果是电脑思考中或游戏结束，不允许操作
+        if (this.isComputerThinking || this.isGameOver) return;
+        
+        // 只允许玩家操作白棋
+        if (this.currentPlayer === 'black') return;
+
         const clickedSquare: Position = { row, col };
         const piece = this.board[row][col];
 
@@ -86,18 +94,29 @@ class ChessGame {
                 this.movePiece(this.selectedPiece, clickedSquare);
                 this.selectedPiece = null;
                 this.validMoves = [];
-                this.currentPlayer = this.currentPlayer === 'white' ? 'black' : 'white';
+                
+                // 玩家下完，切换到电脑
+                this.currentPlayer = 'black';
+                this.renderBoard();
+                
+                // 电脑走棋（稍微延迟，增加体验感）
+                this.isComputerThinking = true;
+                setTimeout(() => {
+                    this.makeComputerMove();
+                    this.isComputerThinking = false;
+                }, 500);
             } else {
                 this.selectedPiece = null;
                 this.validMoves = [];
+                this.renderBoard();
+                this.highlightValidMoves();
             }
-        } else if (piece && piece.color === this.currentPlayer) {
+        } else if (piece && piece.color === 'white') {
             this.selectedPiece = clickedSquare;
             this.validMoves = this.getValidMoves(clickedSquare);
+            this.renderBoard();
+            this.highlightValidMoves();
         }
-
-        this.renderBoard();
-        this.highlightValidMoves();
     }
 
     private isValidMove(from: Position, to: Position): boolean {
@@ -156,7 +175,7 @@ class ChessGame {
             const newCol = pos.col + offset;
             if (this.isValidPosition(pos.row + direction, newCol)) {
                 const targetPiece = this.board[pos.row + direction][newCol];
-                if (targetPiece && targetPiece.color !== this.currentPlayer) {
+                if (targetPiece && targetPiece.color !== this.board[pos.row][pos.col]?.color) {
                     moves.push({ row: pos.row + direction, col: newCol });
                 }
             }
@@ -180,7 +199,8 @@ class ChessGame {
 
             if (this.isValidPosition(newRow, newCol)) {
                 const targetPiece = this.board[newRow][newCol];
-                if (!targetPiece || targetPiece.color !== this.currentPlayer) {
+                const currentPiece = this.board[pos.row][pos.col];
+                if (!targetPiece || (targetPiece.color !== currentPiece?.color)) {
                     moves.push({ row: newRow, col: newCol });
                 }
             }
@@ -210,7 +230,8 @@ class ChessGame {
 
             if (this.isValidPosition(newRow, newCol)) {
                 const targetPiece = this.board[newRow][newCol];
-                if (!targetPiece || targetPiece.color !== this.currentPlayer) {
+                const currentPiece = this.board[pos.row][pos.col];
+                if (!targetPiece || (targetPiece.color !== currentPiece?.color)) {
                     moves.push({ row: newRow, col: newCol });
                 }
             }
@@ -218,6 +239,9 @@ class ChessGame {
     }
 
     private getSlidingMoves(pos: Position, moves: Position[], directions: number[][]) {
+        const currentPiece = this.board[pos.row][pos.col];
+        if (!currentPiece) return;
+
         directions.forEach(([rowDir, colDir]) => {
             let newRow = pos.row + rowDir;
             let newCol = pos.col + colDir;
@@ -227,7 +251,7 @@ class ChessGame {
                 if (!targetPiece) {
                     moves.push({ row: newRow, col: newCol });
                 } else {
-                    if (targetPiece.color !== this.currentPlayer) {
+                    if (targetPiece.color !== currentPiece.color) {
                         moves.push({ row: newRow, col: newCol });
                     }
                     break;
@@ -274,7 +298,84 @@ class ChessGame {
 
     private updateStatus() {
         const status = document.getElementById('status')!;
-        status.textContent = `轮到${this.currentPlayer === 'white' ? '白' : '黑'}方走棋`;
+        if (this.isComputerThinking) {
+            status.textContent = '电脑正在思考...';
+        } else {
+            status.textContent = `轮到${this.currentPlayer === 'white' ? '您(白方)' : '电脑(黑方)'}走棋`;
+        }
+    }
+
+    private makeComputerMove() {
+        // 寻找所有可移动的黑棋
+        const allPossibleMoves: { from: Position, to: Position }[] = [];
+        
+        // 收集所有黑棋的可能移动
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const piece = this.board[row][col];
+                if (piece && piece.color === 'black') {
+                    const from: Position = { row, col };
+                    const validMoves = this.getValidMoves(from);
+                    
+                    validMoves.forEach(to => {
+                        allPossibleMoves.push({ from, to });
+                    });
+                }
+            }
+        }
+        
+        if (allPossibleMoves.length === 0) {
+            // 没有可走的棋，游戏结束
+            this.isGameOver = true;
+            const status = document.getElementById('status')!;
+            status.textContent = '游戏结束，白方获胜！';
+            return;
+        }
+        
+        // 为AI设置一点简单的策略
+        // 1. 优先考虑吃子
+        const captureMoves = allPossibleMoves.filter(move => 
+            this.board[move.to.row][move.to.col] !== null
+        );
+        
+        let selectedMove;
+        
+        if (captureMoves.length > 0) {
+            // 随机选择一个吃子行动
+            selectedMove = captureMoves[Math.floor(Math.random() * captureMoves.length)];
+        } else {
+            // 否则随机选择一个行动
+            selectedMove = allPossibleMoves[Math.floor(Math.random() * allPossibleMoves.length)];
+        }
+        
+        // 移动棋子
+        this.movePiece(selectedMove.from, selectedMove.to);
+        
+        // 切换回玩家的回合
+        this.currentPlayer = 'white';
+        this.renderBoard();
+        
+        // 检查玩家是否还有有效走法
+        let playerHasValidMoves = false;
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const piece = this.board[row][col];
+                if (piece && piece.color === 'white') {
+                    const moves = this.getValidMoves({ row, col });
+                    if (moves.length > 0) {
+                        playerHasValidMoves = true;
+                        break;
+                    }
+                }
+            }
+            if (playerHasValidMoves) break;
+        }
+        
+        if (!playerHasValidMoves) {
+            this.isGameOver = true;
+            const status = document.getElementById('status')!;
+            status.textContent = '游戏结束，黑方获胜！';
+        }
     }
 
     public reset() {
@@ -282,6 +383,8 @@ class ChessGame {
         this.currentPlayer = 'white';
         this.selectedPiece = null;
         this.validMoves = [];
+        this.isComputerThinking = false;
+        this.isGameOver = false;
         this.initializeGame();
     }
 }
