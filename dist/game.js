@@ -53,15 +53,16 @@ class ChessGame {
         this.updateStatus();
     }
     getPieceSymbol(piece) {
+        // 统一使用白棋的图标样式，并为黑棋添加特殊类
         const symbols = {
-            king: ['♔', '♚'],
-            queen: ['♕', '♛'],
-            rook: ['♖', '♜'],
-            bishop: ['♗', '♝'],
-            knight: ['♘', '♞'],
-            pawn: ['♙', '♟']
+            king: '♔',
+            queen: '♕',
+            rook: '♖',
+            bishop: '♗',
+            knight: '♘',
+            pawn: '♙'
         };
-        return symbols[piece.type][piece.color === 'white' ? 0 : 1];
+        return `<span class="${piece.color}-piece">${symbols[piece.type]}</span>`;
     }
     handleSquareClick(row, col) {
         // 如果是电脑思考中或游戏结束，不允许操作

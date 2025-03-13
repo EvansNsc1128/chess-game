@@ -68,15 +68,17 @@ class ChessGame {
     }
 
     private getPieceSymbol(piece: Piece): string {
-        const symbols: Record<PieceType, string[]> = {
-            king: ['♔', '♚'],
-            queen: ['♕', '♛'],
-            rook: ['♖', '♜'],
-            bishop: ['♗', '♝'],
-            knight: ['♘', '♞'],
-            pawn: ['♙', '♟']
+        // 统一使用白棋的图标样式，并为黑棋添加特殊类
+        const symbols: Record<PieceType, string> = {
+            king: '♔',
+            queen: '♕',
+            rook: '♖',
+            bishop: '♗',
+            knight: '♘',
+            pawn: '♙'
         };
-        return symbols[piece.type][piece.color === 'white' ? 0 : 1];
+        
+        return `<span class="${piece.color}-piece">${symbols[piece.type]}</span>`;
     }
 
     private handleSquareClick(row: number, col: number) {
